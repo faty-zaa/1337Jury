@@ -74,3 +74,26 @@ async def list_recodes(
         enriched.append(data)
     
     return enriched
+
+@router.get("/my")
+async def list_my_recodes(
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    """List current user's recode requests"""
+    result = await db.execute(
+        select(RecodeRequest)
+        .where(RecodeRequest.user_id == user.id)
+        .order_by(RecodeRequest.created_at.desc())
+    )
+    recodes = result.scalars().all()
+    
+    enriched = []
+    for r in recodes:
+        data = r.to_dict()
+        project_result = await db.execute(select(Project).where(Project.id == r.project_id))
+        project = project_result.scalar_one_or_none()
+        data["project_name"] = project.name if project else "Unknown Project"
+        enriched.append(data)
+    
+    return enriched
