@@ -75,3 +75,11 @@ CREATE TABLE IF NOT EXISTS subject_votes (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     closed_at TIMESTAMP WITH TIME ZONE
 );
+
+-- Vote options
+CREATE TABLE IF NOT EXISTS vote_options (
+    id SERIAL PRIMARY KEY,
+    subject_vote_id INTEGER REFERENCES subject_votes(id) ON DELETE CASCADE,
+    text VARCHAR(500) NOT NULL,
+    vote_count INTEGER DEFAULT 0
+);
