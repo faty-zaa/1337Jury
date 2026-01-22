@@ -65,3 +65,36 @@ async def create_test(
     await db.commit()
     await db.refresh(test)
     return test.to_dict()
+
+
+@router.post("/{test_id}/approve")
+async def approve_test(
+    test_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_staff_user)
+):
+    result = await db.execute(select(Test).where(Test.id == test_id))
+    test = result.scalar_one_or_none()
+    if not test:
+        raise HTTPException(status_code=404, detail="Test not found")
+
+    test.is_approved = True
+    test.approved_by = user.id
+    await db.commit()
+    return {"message": "Test approved"}
+
+
+@router.post("/{test_id}/reject")
+async def reject_test(
+    test_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_staff_user)
+):
+    result = await db.execute(select(Test).where(Test.id == test_id))
+    test = result.scalar_one_or_none()
+    if not test:
+        raise HTTPException(status_code=404, detail="Test not found")
+
+    await db.delete(test)
+    await db.commit()
+    return {"message": "Test rejected and deleted"}
