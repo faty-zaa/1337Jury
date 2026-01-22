@@ -1,1 +1,1 @@
-serve --single --listen $PORT dist
+serve --single --listen 5173 dist
