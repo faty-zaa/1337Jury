@@ -51,3 +51,30 @@ async def list_comments(
         comments.append(c)
     
     return comments
+
+
+@router.post("")
+async def create_comment(
+    data: CommentCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new comment"""
+    if not data.vote_id and not data.dispute_id:
+        raise HTTPException(status_code=400, detail="Must specify vote_id or dispute_id")
+    
+    comment = Comment(
+        content=data.content,
+        user_id=current_user.id,
+        vote_id=data.vote_id,
+        dispute_id=data.dispute_id,
+        parent_id=data.parent_id
+    )
+    db.add(comment)
+    await db.commit()
+    await db.refresh(comment)
+    
+    result = comment.to_dict()
+    result["user_login"] = current_user.login
+    result["avatar_url"] = current_user.avatar_url
+    return result
