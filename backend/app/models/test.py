@@ -20,3 +20,17 @@ class Test(Base):
     approved_by = Column(Integer, ForeignKey("users.id"), nullable=True)
     downloads = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "github_url": self.github_url,
+            "project_id": self.project_id,
+            "user_id": self.user_id,
+            "is_approved": self.is_approved,
+            "downloads": self.downloads,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
