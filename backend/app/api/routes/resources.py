@@ -54,3 +54,4 @@ async def create_resource(
     await db.commit()
     await db.refresh(resource)
     return resource.to_dict()
+
