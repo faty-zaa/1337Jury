@@ -232,3 +232,22 @@ async def accept_recode(
     await db.commit()
     
     return {"message": "You've accepted to recode!", "recode": recode.to_dict()}
+
+
+@router.post("/{recode_id}/complete")
+async def complete_recode(
+    recode_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    """Mark recode as completed (creator or recoder)"""
+    result = await db.execute(select(RecodeRequest).where(RecodeRequest.id == recode_id))
+    recode = result.scalar_one_or_none()
+    if not recode:
+        raise HTTPException(status_code=404, detail="Recode request not found")
+    if recode.user_id != user.id and recode.matched_user_id != user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    recode.status = "completed"
+    await db.commit()
+    return {"message": "Recode completed!"}
