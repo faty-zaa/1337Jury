@@ -183,3 +183,104 @@ async def vote_dispute(
     await db.commit()
     await db.refresh(dispute)
     return dispute.to_dict()
+
+
+@router.post("/{dispute_id}/staff-decision")
+async def staff_decision(
+    dispute_id: int,
+    data: StaffDecision,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_staff_user)
+):
+    """STAFF OVERRIDE: Staff decision is FINAL regardless of votes"""
+    result = await db.execute(select(Dispute).where(Dispute.id == dispute_id))
+    dispute = result.scalar_one_or_none()
+    if not dispute:
+        raise HTTPException(status_code=404, detail="Dispute not found")
+
+    dispute.status = DisputeStatus.STAFF_DECIDED
+    dispute.winner = DisputeWinner(data.winner)
+    dispute.staff_decision_by = user.id
+    dispute.staff_decision_reason = data.reason
+    dispute.closed_at = datetime.now(timezone.utc)
+
+    await db.commit()
+    return {"message": "Staff decision applied - THIS IS FINAL", "winner": data.winner}
+
+
+@router.post("/{dispute_id}/close")
+async def close_dispute(
+    dispute_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    result = await db.execute(select(Dispute).where(Dispute.id == dispute_id))
+    dispute = result.scalar_one_or_none()
+    if not dispute:
+        raise HTTPException(status_code=404, detail="Dispute not found")
+    if dispute.created_by != user.id and not user.is_staff:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    # Determine winner by votes
+    if dispute.corrector_votes > dispute.corrected_votes:
+        dispute.winner = DisputeWinner.CORRECTOR
+    elif dispute.corrected_votes > dispute.corrector_votes:
+        dispute.winner = DisputeWinner.CORRECTED
+    # If tie, no winner
+
+    dispute.status = DisputeStatus.CLOSED
+    dispute.closed_at = datetime.now(timezone.utc)
+    await db.commit()
+    return {"message": "Dispute closed", "winner": dispute.winner.value if dispute.winner else None}
+
+
+class DisputeUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+
+
+@router.put("/{dispute_id}")
+async def update_dispute(
+    dispute_id: int,
+    data: DisputeUpdate,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    """Update a dispute - only the creator can edit"""
+    result = await db.execute(select(Dispute).where(Dispute.id == dispute_id))
+    dispute = result.scalar_one_or_none()
+    if not dispute:
+        raise HTTPException(status_code=404, detail="Dispute not found")
+    if dispute.created_by != user.id:
+        raise HTTPException(status_code=403, detail="Only the creator can edit this dispute")
+    if dispute.status != DisputeStatus.OPEN:
+        raise HTTPException(status_code=400, detail="Cannot edit a closed dispute")
+
+    if data.title:
+        dispute.title = data.title
+    if data.description:
+        dispute.description = data.description
+
+    await db.commit()
+    await db.refresh(dispute)
+    return dispute.to_dict()
+
+
+@router.delete("/{dispute_id}")
+async def delete_dispute(
+    dispute_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_staff_user)
+):
+    """Delete a dispute - STAFF ONLY"""
+    result = await db.execute(select(Dispute).where(Dispute.id == dispute_id))
+    dispute = result.scalar_one_or_none()
+    if not dispute:
+        raise HTTPException(status_code=404, detail="Dispute not found")
+
+    # Delete associated votes first
+    from sqlalchemy import delete
+    await db.execute(delete(DisputeVote).where(DisputeVote.dispute_id == dispute_id))
+    await db.delete(dispute)
+    await db.commit()
+    return {"message": "Dispute deleted"}
