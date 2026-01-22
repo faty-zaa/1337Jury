@@ -83,3 +83,8 @@ CREATE TABLE IF NOT EXISTS vote_options (
     text VARCHAR(500) NOT NULL,
     vote_count INTEGER DEFAULT 0
 );
+
+-- Add FK after vote_options exists
+ALTER TABLE subject_votes 
+ADD CONSTRAINT fk_winning_option 
+FOREIGN KEY (winning_option_id) REFERENCES vote_options(id);
