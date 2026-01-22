@@ -118,3 +118,17 @@ async def list_campuses():
         {"id": "seoul", "name": "42 Seoul"},
         {"id": "other", "name": "Other"},
     ]
+
+
+@router.get("/platforms")
+async def list_platforms():
+    """List available meeting platforms"""
+    return [
+        {"id": "discord", "name": "Discord", "icon": "🎮"},
+        {"id": "google_meet", "name": "Google Meet", "icon": "📹"},
+        {"id": "zoom", "name": "Zoom", "icon": "💻"},
+        {"id": "teams", "name": "Microsoft Teams", "icon": "👥"},
+        {"id": "slack", "name": "Slack Huddle", "icon": "💬"},
+        {"id": "in_person", "name": "In Person", "icon": "🏫"},
+        {"id": "other", "name": "Other", "icon": "🔗"},
+    ]
