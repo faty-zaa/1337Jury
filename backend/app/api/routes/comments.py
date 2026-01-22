@@ -78,3 +78,24 @@ async def create_comment(
     result["user_login"] = current_user.login
     result["avatar_url"] = current_user.avatar_url
     return result
+
+
+@router.delete("/{comment_id}")
+async def delete_comment(
+    comment_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a comment (owner or staff only)"""
+    result = await db.execute(select(Comment).where(Comment.id == comment_id))
+    comment = result.scalar_one_or_none()
+    
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    
+    if comment.user_id != current_user.id and not current_user.is_staff:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    await db.delete(comment)
+    await db.commit()
+    return {"message": "Comment deleted"}
