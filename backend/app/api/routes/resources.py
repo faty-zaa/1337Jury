@@ -21,3 +21,7 @@ class ResourceCreate(BaseModel):
     description: str | None = None
     resource_type: str = "other"
     project_id: int
+
+
+class VoteRequest(BaseModel):
+    is_upvote: bool
