@@ -67,3 +67,25 @@ async def callback(code: str = Query(...), db: AsyncSession = Depends(get_db)):
     })
 
     return RedirectResponse(url=f"{settings.FRONTEND_URL}/callback?token={jwt_token}")
+
+
+@router.get("/me")
+async def get_me(token: str = Query(...), db: AsyncSession = Depends(get_db)):
+    payload = verify_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    result = await db.execute(select(User).where(User.id == int(payload.get("sub"))))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return user.to_dict()
+
+
+@router.get("/verify")
+async def verify(token: str = Query(...)):
+    payload = verify_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return {"valid": True, "user_id": payload.get("sub"), "login": payload.get("login"), "is_staff": payload.get("is_staff")}
