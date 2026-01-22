@@ -1,4 +1,4 @@
-// Resources Page - Resource Vault (No project selection required)
+
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { resourcesApi, projectsApi } from '../services/api'
@@ -84,7 +84,6 @@ export default function Resources() {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {['all', 'article', 'video', 'documentation', 'tutorial', 'tool'].map(t => (
           <button
@@ -99,7 +98,6 @@ export default function Resources() {
         ))}
       </div>
 
-      {/* Add form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-[#161b22] rounded-lg p-4 mb-6 border border-gray-800">
           <h3 className="font-semibold mb-4">Add New Resource</h3>
@@ -153,11 +151,9 @@ export default function Resources() {
         </form>
       )}
 
-      {/* Resources list */}
       <div className="space-y-3">
         {filteredResources.map(r => (
           <div key={r.id} className="bg-[#161b22] rounded-lg p-4 border border-gray-800 flex gap-4 hover:border-gray-700 transition-colors">
-            {/* Vote buttons */}
             <div className="flex flex-col items-center gap-1 min-w-[60px]">
               <button 
                 onClick={() => handleVote(r.id, true)} 
@@ -180,7 +176,6 @@ export default function Resources() {
               </button>
             </div>
 
-            {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <span className="text-xs bg-[#0d1117] text-gray-400 px-2 py-0.5 rounded border border-gray-700">
@@ -205,7 +200,6 @@ export default function Resources() {
               </div>
             </div>
 
-            {/* Delete button */}
             {(r.user_id === user?.id || user?.is_staff) && (
               <button 
                 onClick={() => handleDelete(r.id)} 

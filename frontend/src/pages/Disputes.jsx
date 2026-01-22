@@ -1,7 +1,4 @@
-// 1337Jury - Disputes Page
-// This file is for: FATYZA (Frontend Developer)
-// Description: Correction disputes with STAFF OVERRIDE
-// Disputes Page - Live War Room (No project selection required)
+
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { disputesApi, projectsApi } from '../services/api'
@@ -140,7 +137,6 @@ export default function Disputes() {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="flex gap-2 mb-6">
         {['all', 'open', 'decided'].map(f => (
           <button
@@ -155,7 +151,6 @@ export default function Disputes() {
         ))}
       </div>
 
-      {/* Create form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-[#161b22] rounded-lg p-4 mb-6 border border-red-500/30">
           <h3 className="font-semibold mb-4 text-red-400">🚨 Report New Dispute</h3>
@@ -210,7 +205,6 @@ export default function Disputes() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Disputes list */}
         <div className="space-y-3 order-2 lg:order-1">
           {filteredDisputes.map(d => (
             <div
@@ -284,7 +278,6 @@ export default function Disputes() {
           )}
         </div>
 
-        {/* Dispute detail */}
         {selectedDispute && (
           <div className="bg-[#161b22] rounded-lg p-4 sm:p-6 border border-gray-800 lg:sticky lg:top-6 order-1 lg:order-2">
             <div className="flex items-center gap-2 mb-4">
@@ -297,7 +290,6 @@ export default function Disputes() {
             <h3 className="text-xl font-semibold mb-2">{selectedDispute.title}</h3>
             <p className="text-gray-400 text-sm mb-6">{selectedDispute.description}</p>
 
-            {/* Vote section */}
             <div className="grid grid-cols-2 gap-4">
               <div className={`p-4 rounded-lg border text-center transition-all ${
                 selectedDispute.winner === 'corrector' ? 'border-green-500 bg-green-500/10' : 'border-gray-700 bg-[#0d1117]'

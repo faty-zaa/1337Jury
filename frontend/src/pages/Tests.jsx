@@ -1,7 +1,4 @@
-// 1337Jury - Tests Repository Page
-// This file is for: FATYZA (Frontend Developer)
-// Description: Test cases with staff approval
-// Tests Page - Community Tests Sharing
+
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { testsApi, projectsApi } from '../services/api'
@@ -122,7 +119,6 @@ export default function Tests() {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="flex gap-2 mb-6 flex-wrap">
         <button
           onClick={() => setFilter('all')}
@@ -144,8 +140,6 @@ export default function Tests() {
           </button>
         ))}
       </div>
-
-      {/* Pending Tests (Staff Only) */}
       {showPending && user?.is_staff && pendingTests.length > 0 && (
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 mb-6">
           <h3 className="font-semibold text-yellow-400 mb-4 flex items-center gap-2">
@@ -179,7 +173,6 @@ export default function Tests() {
         </div>
       )}
 
-      {/* Submit Form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-[#161b22] rounded-lg p-4 mb-6 border border-gray-800">
           <h3 className="font-semibold mb-4">Submit a Test</h3>
@@ -229,8 +222,6 @@ export default function Tests() {
           </div>
         </form>
       )}
-
-      {/* Tests List */}
       <div className="space-y-3">
         {filteredTests.map(t => (
           <div key={t.id} className="bg-[#161b22] rounded-lg p-4 border border-gray-800 hover:border-gray-700 transition-colors">

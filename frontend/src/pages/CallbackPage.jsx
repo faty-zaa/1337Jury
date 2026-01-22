@@ -1,7 +1,4 @@
-// 1337Jury - OAuth Callback Page
-// This file is for: FATYZA (Frontend Developer)
-// Description: Handle OAuth callback and store token
-// Callback Page
+
 import { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'

@@ -1,4 +1,4 @@
-// Profile Page
+
 import { useAuthStore } from '../store/authStore'
 import { useEffect, useState } from 'react'
 import { votesApi, disputesApi, resourcesApi } from '../services/api'
@@ -32,7 +32,6 @@ export default function Profile() {
     <div className="p-4 sm:p-6 max-w-2xl">
       <h1 className="text-xl sm:text-2xl font-bold font-mono mb-6 flex items-center gap-2">👤 Profile</h1>
 
-      {/* User Card */}
       <div className="bg-[#161b22] rounded-xl p-4 sm:p-6 border border-gray-800 mb-6">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
           {user.avatar_url ? (
@@ -55,7 +54,6 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-[#161b22] rounded-lg p-4 border border-gray-800 text-center">
           <p className="text-3xl font-bold text-[#00d4aa]">{stats.resources}</p>
@@ -71,7 +69,6 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Staff Powers */}
       {user.is_staff && (
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
           <h3 className="font-semibold text-yellow-400 mb-2 flex items-center gap-2">
@@ -87,7 +84,6 @@ export default function Profile() {
         </div>
       )}
 
-      {/* Info */}
       <div className="mt-6 text-gray-600 text-sm">
         <p>Member since joining 42 · Authenticated via 42 OAuth</p>
       </div>

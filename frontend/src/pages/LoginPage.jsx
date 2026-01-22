@@ -1,7 +1,4 @@
-// 1337Jury - Login Page
-// This file is for: FATYZA (Frontend Developer)
-// Description: Landing page with 42 OAuth login
-// Login Page - Peer Intelligence Terminal Style
+
 import { authApi } from '../services/api'
 
 export default function LoginPage() {

@@ -1,7 +1,4 @@
-// 1337Jury - Dashboard Page
-// This file is for: FATYZA (Frontend Developer)
-// Description: Welcome page with stats overview
-// Feed Page - Main Dashboard (Reddit-style)
+
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { votesApi, disputesApi, projectsApi, commentsApi } from '../services/api'
@@ -40,7 +37,6 @@ export default function Dashboard() {
         disputesApi.list().catch(() => ({ data: [] }))
       ])
 
-      // Load vote details for each vote to get option counts
       const votesWithDetails = await Promise.all(
         (votesRes.data || []).map(async v => {
           try {
@@ -51,10 +47,7 @@ export default function Dashboard() {
           }
         })
       )
-
-      // Combine votes and disputes into a unified feed
       const votesPosts = votesWithDetails.map(v => {
-        // First option is "Agree" (upvote), second is "Disagree" (downvote)
         const agreeOption = v.options?.[0]
         const disagreeOption = v.options?.[1]
         return {
@@ -100,7 +93,7 @@ export default function Dashboard() {
 
       setPosts(allPosts)
 
-      // Load comment counts
+    
       const voteIds = votesPosts.map(p => p.realId)
       const disputeIds = disputesPosts.map(p => p.realId)
       if (voteIds.length || disputeIds.length) {
@@ -135,12 +128,12 @@ export default function Dashboard() {
   const handleUpvote = async (post) => {
     try {
       if (post.type === 'proposal') {
-        // Vote for first option (Agree) - use cached options
+    
         if (post.options?.length > 0) {
           await votesApi.cast(post.realId, post.options[0].id)
         }
       } else {
-        // Vote for corrector
+
         await disputesApi.vote(post.realId, 'corrector')
       }
       loadFeed()
@@ -153,12 +146,12 @@ export default function Dashboard() {
   const handleDownvote = async (post) => {
     try {
       if (post.type === 'proposal') {
-        // Vote for second option (Disagree) - use cached options
+
         if (post.options?.length > 1) {
           await votesApi.cast(post.realId, post.options[1].id)
         }
       } else {
-        // Vote for corrected
+    
         await disputesApi.vote(post.realId, 'corrected')
       }
       loadFeed()
@@ -196,9 +189,9 @@ export default function Dashboard() {
         dispute_id: post.type === 'dispute' ? post.realId : null
       })
       setNewComment('')
-      toggleComments(post) // Reload comments
+      toggleComments(post)
       setExpandedPost(post.id)
-      // Update count
+
       const key = post.type === 'proposal' ? `vote-${post.realId}` : `dispute-${post.realId}`
       setCommentCounts(prev => ({ ...prev, [key]: (prev[key] || 0) + 1 }))
     } catch (e) { console.error(e) }
@@ -273,7 +266,7 @@ export default function Dashboard() {
 
   return (
     <div className="p-6">
-      {/* Search Bar */}
+
       <div className="mb-6">
         <div className="relative">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">🔍</span>
@@ -287,7 +280,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Post Creator */}
+    
       <div className="bg-[#161b22] rounded-lg p-4 mb-6 border border-gray-800">
         <textarea
           placeholder="Stuck on a logic gate? Ask the hive..."
@@ -316,14 +309,14 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Active Proposals Section */}
+    
       <div className="mb-4">
         <h2 className="text-lg font-semibold flex items-center gap-2 text-yellow-400 mb-4">
           <span>⚡</span> Active Proposals
         </h2>
       </div>
 
-      {/* Feed */}
+    
       {loading ? (
         <div className="text-center py-10 text-gray-500">Loading feed...</div>
       ) : filteredPosts.length === 0 ? (
@@ -334,7 +327,7 @@ export default function Dashboard() {
         <div className="space-y-4">
           {filteredPosts.map(post => (
             <div key={post.id} className="bg-[#161b22] rounded-lg p-4 border border-gray-800 hover:border-gray-700 transition-colors">
-              {/* Post Header */}
+            
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xs bg-[#0d1117] text-[#00d4aa] px-2 py-0.5 rounded border border-gray-700">
@@ -352,7 +345,7 @@ export default function Dashboard() {
                     <span className="text-xs text-gray-500">by @{post.user_login}</span>
                   )}
                 </div>
-                {/* Edit/Delete buttons */}
+                
                 <div className="flex items-center gap-2">
                   {post.original?.user_id === user?.id && post.status === 'open' && (
                     <button
@@ -375,7 +368,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Edit Form */}
+            
               {editingPost === post.id ? (
                 <div className="mb-4 p-3 bg-[#0d1117] rounded-lg border border-[#00d4aa]/50">
                   <input
@@ -409,17 +402,16 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <>
-                  {/* Post Title */}
+                 
                   <h3 className="font-semibold mb-2">
                     {post.type === 'proposal' ? 'Proposal: ' : ''}{post.title}
                   </h3>
 
-                  {/* Post Description */}
                   <p className="text-gray-400 text-sm mb-4 line-clamp-2">{post.description}</p>
                 </>
               )}
 
-              {/* Post Footer */}
+        
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <button 
@@ -446,10 +438,10 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              {/* Expanded Comments Section */}
+        
               {expandedPost === post.id && (
                 <div className="mt-4 pt-4 border-t border-gray-700">
-                  {/* Add Comment Form */}
+            
                   <div className="flex gap-2 mb-4">
                     <input
                       type="text"
@@ -468,7 +460,6 @@ export default function Dashboard() {
                     </button>
                   </div>
 
-                  {/* Comments List */}
                   <div className="space-y-3">
                     {comments.length === 0 ? (
                       <p className="text-gray-500 text-sm text-center py-2">No comments yet. Be the first!</p>

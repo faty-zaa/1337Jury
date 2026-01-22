@@ -1,7 +1,4 @@
-// 1337Jury - Subject Votes Page
-// This file is for: FATYZA (Frontend Developer)
-// Description: Subject clarification voting with STAFF OVERRIDE
-// Votes Page - Consensus Court (No project selection required)
+
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { votesApi, projectsApi } from '../services/api'
@@ -32,7 +29,6 @@ export default function Votes() {
   const loadVotes = async () => {
     try {
       const { data } = await votesApi.list()
-      // Load vote details for each vote to get accurate option counts
       const votesWithDetails = await Promise.all(
         (data || []).map(async v => {
           try {
@@ -147,7 +143,6 @@ export default function Votes() {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-wrap gap-2 mb-6">
         {['all', 'open', 'decided'].map(f => (
           <button
@@ -162,7 +157,6 @@ export default function Votes() {
         ))}
       </div>
 
-      {/* Create form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-[#161b22] rounded-lg p-4 mb-6 border border-gray-800">
           <h3 className="font-semibold mb-4">Create New Proposal</h3>
@@ -218,7 +212,7 @@ export default function Votes() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Votes list */}
+    
         <div className="space-y-3 order-2 lg:order-1">
           {filteredVotes.map(v => (
             <div
@@ -292,7 +286,6 @@ export default function Votes() {
           )}
         </div>
 
-        {/* Vote detail */}
         {selectedVote && (
           <div className="bg-[#161b22] rounded-lg p-4 sm:p-6 border border-gray-800 lg:sticky lg:top-6 order-1 lg:order-2">
             <div className="flex items-center gap-2 mb-4">
@@ -318,7 +311,7 @@ export default function Votes() {
                       isWinner ? 'border-green-500 bg-green-500/5' : 'border-gray-700 bg-[#0d1117]'
                     }`}
                   >
-                    {/* Progress bar */}
+            
                     <div 
                       className="absolute inset-0 bg-[#00d4aa]/10 transition-all"
                       style={{ width: `${percentage}%` }}

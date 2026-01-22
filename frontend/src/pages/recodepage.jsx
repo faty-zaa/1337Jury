@@ -1,4 +1,4 @@
-// Recode Me Page - Mock Evaluation & Recoding Requests
+
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { recodesApi, projectsApi } from '../services/api'
@@ -24,7 +24,6 @@ export default function RecodePage() {
 
   useEffect(() => {
     loadData()
-    // Auto-refresh every 15 seconds to show new requests from others
     const interval = setInterval(loadData, 15000)
     return () => clearInterval(interval)
   }, [])
@@ -32,7 +31,7 @@ export default function RecodePage() {
   const loadData = async () => {
     setLoading(true)
     try {
-      // Load all data in parallel
+
       const [recodesRes, projectsRes, campusesRes, platformsRes] = await Promise.all([
         recodesApi.list().catch((e) => { console.error('Error loading recodes:', e); return { data: [] } }),
         projectsApi.list().catch((e) => { console.error('Error loading projects:', e); return { data: [] } }),
@@ -40,7 +39,6 @@ export default function RecodePage() {
         recodesApi.getPlatforms().catch((e) => { console.error('Error loading platforms:', e); return { data: [] } })
       ])
       
-      // Extract data from axios responses
       const recodesData = recodesRes?.data || []
       const projectsData = projectsRes?.data || []
       const campusesData = campusesRes?.data || []
@@ -56,7 +54,6 @@ export default function RecodePage() {
       setCampuses(campusesData)
       setPlatforms(platformsData)
       
-      // Load user's own requests
       try {
         const myRes = await recodesApi.myRequests()
         setMyRecodes(myRes?.data || [])
@@ -148,7 +145,7 @@ export default function RecodePage() {
 
   return (
     <div className="p-4 sm:p-6">
-      {/* Header */}
+     
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold font-mono flex items-center gap-2">
@@ -182,7 +179,6 @@ export default function RecodePage() {
         </div>
       </div>
 
-      {/* My Requests Panel */}
       {showMyRequests && myRecodes.length > 0 && (
         <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 mb-6">
           <h3 className="font-semibold text-purple-400 mb-4 flex items-center gap-2">
@@ -239,7 +235,6 @@ export default function RecodePage() {
         </div>
       )}
 
-      {/* Submit Form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-[#161b22] rounded-lg p-6 mb-6 border border-gray-800">
           <h3 className="font-semibold mb-4 flex items-center gap-2">
@@ -249,7 +244,7 @@ export default function RecodePage() {
             Looking for someone to do a mock evaluation or help you practice? Post your request here!
           </p>
           <div className="grid gap-4 md:grid-cols-2">
-            {/* Project */}
+          
             <div>
               <label className="block text-sm text-gray-400 mb-1">Project *</label>
               <select
@@ -265,7 +260,6 @@ export default function RecodePage() {
               </select>
             </div>
 
-            {/* Campus */}
             <div>
               <label className="block text-sm text-gray-400 mb-1">Preferred Campus *</label>
               <select
@@ -281,7 +275,6 @@ export default function RecodePage() {
               </select>
             </div>
 
-            {/* Meeting Platform */}
             <div>
               <label className="block text-sm text-gray-400 mb-1">Meeting Platform *</label>
               <select
@@ -296,8 +289,6 @@ export default function RecodePage() {
                 ))}
               </select>
             </div>
-
-            {/* Meeting Link */}
             <div>
               <label className="block text-sm text-gray-400 mb-1">Meeting Link (optional)</label>
               <input
@@ -309,7 +300,6 @@ export default function RecodePage() {
               />
             </div>
 
-            {/* Description */}
             <div className="md:col-span-2">
               <label className="block text-sm text-gray-400 mb-1">Additional Notes</label>
               <textarea
@@ -339,7 +329,6 @@ export default function RecodePage() {
         </form>
       )}
 
-      {/* Filters */}
       <div className="flex flex-wrap gap-4 mb-6">
         <div className="flex items-center gap-2">
           <span className="text-gray-500 text-sm">Project:</span>
@@ -369,7 +358,6 @@ export default function RecodePage() {
         </div>
       </div>
 
-      {/* Recode Requests List */}
       <div className="space-y-4">
         {loading ? (
           <div className="text-center py-12 text-gray-500">
@@ -390,7 +378,7 @@ export default function RecodePage() {
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  {/* Header */}
+                
                   <div className="flex items-center gap-3 mb-2">
                     {recode.user_image ? (
                       <img src={recode.user_image} alt="" className="w-10 h-10 rounded-full" />
@@ -405,7 +393,6 @@ export default function RecodePage() {
                     </div>
                   </div>
 
-                  {/* Project & Details */}
                   <div className="ml-13 pl-0.5">
                     <h3 className="font-semibold text-lg mb-2">{recode.project_name}</h3>
                     
@@ -440,7 +427,6 @@ export default function RecodePage() {
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex flex-col gap-2 ml-4">
                   {recode.user_id !== user?.id && recode.status === 'open' && (
                     <button
