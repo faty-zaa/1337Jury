@@ -159,3 +159,22 @@ async def create_recode(
     await db.commit()
     await db.refresh(recode)
     return recode.to_dict()
+
+
+@router.get("/{recode_id}")
+async def get_recode(recode_id: int, db: AsyncSession = Depends(get_db)):
+    """Get a single recode request"""
+    result = await db.execute(select(RecodeRequest).where(RecodeRequest.id == recode_id))
+    recode = result.scalar_one_or_none()
+    if not recode:
+        raise HTTPException(status_code=404, detail="Recode request not found")
+    
+    data = recode.to_dict()
+    
+    # Enrich with user info
+    user_result = await db.execute(select(User).where(User.id == recode.user_id))
+    user = user_result.scalar_one_or_none()
+    data["user_login"] = user.login if user else "Unknown"
+    data["user_image"] = user.avatar_url if user else None
+    
+    return data
