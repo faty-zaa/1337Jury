@@ -209,3 +209,26 @@ async def update_recode(
     await db.commit()
     await db.refresh(recode)
     return recode.to_dict()
+
+
+@router.post("/{recode_id}/accept")
+async def accept_recode(
+    recode_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    """Accept a recode request (become the recoder)"""
+    result = await db.execute(select(RecodeRequest).where(RecodeRequest.id == recode_id))
+    recode = result.scalar_one_or_none()
+    if not recode:
+        raise HTTPException(status_code=404, detail="Recode request not found")
+    if recode.status != "open":
+        raise HTTPException(status_code=400, detail="Request is not open")
+    if recode.user_id == user.id:
+        raise HTTPException(status_code=400, detail="Cannot accept your own request")
+    
+    recode.status = "matched"
+    recode.matched_user_id = user.id
+    await db.commit()
+    
+    return {"message": "You've accepted to recode!", "recode": recode.to_dict()}
