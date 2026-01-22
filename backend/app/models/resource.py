@@ -29,3 +29,19 @@ class Resource(Base):
     upvotes = Column(Integer, default=0)
     downvotes = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "url": self.url,
+            "description": self.description,
+            "resource_type": self.resource_type.value if self.resource_type else None,
+            "project_id": self.project_id,
+            "user_id": self.user_id,
+            "upvotes": self.upvotes,
+            "downvotes": self.downvotes,
+            "score": self.upvotes - self.downvotes,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
