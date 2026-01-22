@@ -36,3 +36,13 @@ CREATE TABLE IF NOT EXISTS resources (
     downvotes INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Resource votes
+CREATE TABLE IF NOT EXISTS resource_votes (
+    id SERIAL PRIMARY KEY,
+    resource_id INTEGER REFERENCES resources(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id),
+    is_upvote BOOLEAN NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(resource_id, user_id)
+);
