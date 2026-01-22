@@ -210,3 +210,27 @@ async def update_vote(
     await db.commit()
     await db.refresh(vote)
     return vote.to_dict()
+
+
+@router.delete("/{vote_id}")
+async def delete_vote(
+    vote_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_staff_user)
+):
+    """Delete a vote - STAFF ONLY"""
+    result = await db.execute(select(SubjectVote).where(SubjectVote.id == vote_id))
+    vote = result.scalar_one_or_none()
+    if not vote:
+        raise HTTPException(status_code=404, detail="Vote not found")
+
+    # Delete associated options and user votes first
+    await db.execute(select(UserVote).where(UserVote.subject_vote_id == vote_id))
+    await db.execute(select(VoteOption).where(VoteOption.subject_vote_id == vote_id))
+    
+    from sqlalchemy import delete
+    await db.execute(delete(UserVote).where(UserVote.subject_vote_id == vote_id))
+    await db.execute(delete(VoteOption).where(VoteOption.subject_vote_id == vote_id))
+    await db.delete(vote)
+    await db.commit()
+    return {"message": "Vote deleted"}
