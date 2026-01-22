@@ -98,3 +98,34 @@ async def reject_test(
     await db.delete(test)
     await db.commit()
     return {"message": "Test rejected and deleted"}
+
+@router.post("/{test_id}/download")
+async def download_test(test_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Test).where(Test.id == test_id))
+    test = result.scalar_one_or_none()
+    if not test:
+        raise HTTPException(status_code=404, detail="Test not found")
+    if not test.is_approved:
+        raise HTTPException(status_code=403, detail="Test not approved")
+
+    test.downloads += 1
+    await db.commit()
+    return {"github_url": test.github_url, "downloads": test.downloads}
+
+
+@router.delete("/{test_id}")
+async def delete_test(
+    test_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    result = await db.execute(select(Test).where(Test.id == test_id))
+    test = result.scalar_one_or_none()
+    if not test:
+        raise HTTPException(status_code=404, detail="Test not found")
+    if test.user_id != user.id and not user.is_staff:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    await db.delete(test)
+    await db.commit()
+    return {"message": "Deleted"}
