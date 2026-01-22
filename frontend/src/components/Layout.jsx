@@ -1,7 +1,4 @@
-// 1337Jury - Layout Component
-// This file is for: FATYZA (Frontend Developer)
-// Description: Main layout with sidebar navigation
-// Layout Component - Peer Intelligence Terminal Style
+
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { useEffect, useState } from 'react'
@@ -23,7 +20,6 @@ export default function Layout() {
   useEffect(() => {
     fetchUser()
     loadSidebarData()
-    // Refresh sidebar data every 30 seconds
     const interval = setInterval(loadSidebarData, 30000)
     return () => clearInterval(interval)
   }, [])
@@ -71,7 +67,6 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-[#0d1117] text-gray-200 flex">
-      {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-[#0d1117] border-b border-gray-800 z-50 px-4 py-3 flex items-center justify-between">
         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-2xl">
           ☰
@@ -84,7 +79,7 @@ export default function Layout() {
         </button>
       </div>
 
-      {/* Mobile Menu Overlay */}
+    
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setMobileMenuOpen(false)} />
       )}
@@ -92,7 +87,6 @@ export default function Layout() {
         <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setMobileRightOpen(false)} />
       )}
 
-      {/* Left Sidebar */}
       <aside className={`w-56 bg-[#0d1117] border-r border-gray-800 p-4 flex flex-col fixed h-full z-50 transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
         <div className="mb-6">
           <h1 className="text-xl font-bold text-[#00d4aa] flex items-center gap-2 font-mono">
@@ -122,7 +116,6 @@ export default function Layout() {
           ))}
         </nav>
 
-        {/* User info */}
         {user && (
           <div className="border-t border-gray-800 pt-4 mt-4">
             <div className="flex items-center gap-3 mb-3 px-2">
@@ -147,14 +140,12 @@ export default function Layout() {
         )}
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 lg:ml-56 lg:mr-72 pt-16 lg:pt-0">
         <Outlet />
       </main>
 
-      {/* Right Sidebar */}
       <aside className={`w-72 bg-[#0d1117] border-l border-gray-800 p-4 fixed right-0 h-full overflow-y-auto z-50 transition-transform duration-300 ${mobileRightOpen ? 'translate-x-0' : 'translate-x-full'} lg:translate-x-0`}>
-        {/* Platform Stats */}
+       
         <div className="mb-4 grid grid-cols-3 gap-2">
           <div className="bg-[#161b22] rounded-lg p-2 text-center border border-gray-800">
             <div className="text-lg font-bold text-[#00d4aa]">{sidebarData.stats.activeProposals}</div>
@@ -170,7 +161,6 @@ export default function Layout() {
           </div>
         </div>
 
-        {/* Active Proposals */}
         {sidebarData.recentVotes.length > 0 && (
           <div className="bg-[#161b22] rounded-lg p-4 mb-4 border border-gray-800">
             <h3 className="font-semibold text-sm flex items-center gap-2 mb-3 text-[#00d4aa]">
@@ -197,7 +187,6 @@ export default function Layout() {
           </div>
         )}
 
-        {/* Live War Room */}
         <div className="bg-[#161b22] rounded-lg p-4 mb-4 border border-gray-800">
           <h3 className="font-semibold text-sm flex items-center gap-2 mb-2 text-red-400">
             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
@@ -230,7 +219,6 @@ export default function Layout() {
           </button>
         </div>
 
-        {/* Community Tests */}
         {sidebarData.tests.length > 0 && (
           <div className="bg-[#161b22] rounded-lg p-4 mb-4 border border-gray-800">
             <h3 className="font-semibold text-sm flex items-center gap-2 mb-3">
@@ -258,7 +246,6 @@ export default function Layout() {
           </div>
         )}
 
-        {/* Resource Vault */}
         <div className="bg-[#161b22] rounded-lg p-4 mb-4 border border-gray-800">
           <h3 className="font-semibold text-sm flex items-center gap-2 mb-3">
             <span>📁</span> Resource Vault
@@ -289,7 +276,6 @@ export default function Layout() {
           </button>
         </div>
 
-        {/* Staff Presence */}
         <div className="bg-[#161b22] rounded-lg p-4 border border-gray-800">
           <h3 className="font-semibold text-sm flex items-center gap-2 mb-2">
             <span className="text-yellow-500">🛡️</span> Staff Presence
