@@ -9,8 +9,8 @@ import Resources from './pages/Resources'
 import Votes from './pages/Votes'
 import Disputes from './pages/Disputes'
 import Tests from './pages/Tests'
-import RecodePage from './pages/RecodePage'
-import Profile from './pages/Profile'
+import RecodePage from './pages/recodepage'
+import Profile from './pages/profile'
 
 function ProtectedRoute({ children }) {
   const { token } = useAuthStore()
