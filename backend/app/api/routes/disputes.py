@@ -101,3 +101,85 @@ async def get_dispute(
     return dispute_dict
 
 
+@router.post("")
+async def create_dispute(
+    data: DisputeCreate,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    # Resolve usernames to IDs
+    corrector_result = await db.execute(select(User).where(User.login == data.corrector_username))
+    corrector = corrector_result.scalar_one_or_none()
+    if not corrector:
+        raise HTTPException(status_code=404, detail=f"Corrector user '{data.corrector_username}' not found")
+    
+    corrected_result = await db.execute(select(User).where(User.login == data.corrected_username))
+    corrected = corrected_result.scalar_one_or_none()
+    if not corrected:
+        raise HTTPException(status_code=404, detail=f"Corrected user '{data.corrected_username}' not found")
+    
+    dispute = Dispute(
+        title=data.title,
+        description=data.description,
+        project_id=data.project_id,
+        corrector_id=corrector.id,
+        corrected_id=corrected.id,
+        created_by=user.id,
+    )
+    db.add(dispute)
+    await db.commit()
+    await db.refresh(dispute)
+    
+    dispute_dict = dispute.to_dict()
+    # Show usernames to the creator (they just entered them)
+    dispute_dict["corrector_username"] = corrector.login if corrector.id == user.id else None
+    dispute_dict["corrected_username"] = corrected.login if corrected.id == user.id else None
+    
+    return dispute_dict
+
+
+@router.post("/{dispute_id}/vote")
+async def vote_dispute(
+    dispute_id: int,
+    data: DisputeVoteRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    result = await db.execute(select(Dispute).where(Dispute.id == dispute_id))
+    dispute = result.scalar_one_or_none()
+    if not dispute:
+        raise HTTPException(status_code=404, detail="Dispute not found")
+    if dispute.status != DisputeStatus.OPEN:
+        raise HTTPException(status_code=400, detail="Dispute is closed")
+
+    vote_for = DisputeWinner(data.vote_for)
+
+    # Check existing vote
+    result = await db.execute(
+        select(DisputeVote).where(DisputeVote.dispute_id == dispute_id, DisputeVote.user_id == user.id)
+    )
+    existing = result.scalar_one_or_none()
+
+    if existing:
+        if existing.vote_for == vote_for:
+            raise HTTPException(status_code=400, detail="Already voted for this option")
+        # Change vote
+        if existing.vote_for == DisputeWinner.CORRECTOR:
+            dispute.corrector_votes -= 1
+            dispute.corrected_votes += 1
+        else:
+            dispute.corrected_votes -= 1
+            dispute.corrector_votes += 1
+        existing.vote_for = vote_for
+    else:
+        # New vote
+        vote = DisputeVote(dispute_id=dispute_id, user_id=user.id, vote_for=vote_for)
+        db.add(vote)
+        if vote_for == DisputeWinner.CORRECTOR:
+            dispute.corrector_votes += 1
+        else:
+            dispute.corrected_votes += 1
+
+    await db.commit()
+    await db.refresh(dispute)
+    return dispute.to_dict()
