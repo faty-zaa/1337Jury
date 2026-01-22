@@ -98,3 +98,22 @@ CREATE TABLE IF NOT EXISTS user_votes (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(subject_vote_id, user_id)
 );
+
+-- Disputes table
+CREATE TABLE IF NOT EXISTS disputes (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    project_id INTEGER REFERENCES projects(id),
+    corrector_id INTEGER REFERENCES users(id),
+    corrected_id INTEGER REFERENCES users(id),
+    created_by INTEGER REFERENCES users(id),
+    status VARCHAR(50) DEFAULT 'open',
+    winner VARCHAR(50),
+    corrector_votes INTEGER DEFAULT 0,
+    corrected_votes INTEGER DEFAULT 0,
+    staff_decision_by INTEGER REFERENCES users(id),
+    staff_decision_reason TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    closed_at TIMESTAMP WITH TIME ZONE
+);
