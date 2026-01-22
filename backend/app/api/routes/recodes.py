@@ -132,3 +132,30 @@ async def list_platforms():
         {"id": "in_person", "name": "In Person", "icon": "🏫"},
         {"id": "other", "name": "Other", "icon": "🔗"},
     ]
+
+
+@router.post("")
+async def create_recode(
+    data: RecodeCreate,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user)
+):
+    """Create a new recode request"""
+    # Check if project exists
+    project_result = await db.execute(select(Project).where(Project.id == data.project_id))
+    if not project_result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    recode = RecodeRequest(
+        user_id=user.id,
+        project_id=data.project_id,
+        campus=data.campus,
+        meeting_platform=data.meeting_platform,
+        meeting_link=data.meeting_link,
+        description=data.description,
+        status="open"
+    )
+    db.add(recode)
+    await db.commit()
+    await db.refresh(recode)
+    return recode.to_dict()
